@@ -5,20 +5,29 @@ import chess
 
 class ChessUI(object):
 
-    def __init__(self):
+    def __init__(self, white_agent, black_agent):
         self.board = chess.Board()
+        self.white_agent = white_agent
+        self.black_agent = black_agent
 
-    def _random_move(self, target, event):
-        random_move = np.random.choice(list(self.board.legal_moves))
-        self.board.push(random_move)
+    def _move(self, target, event):
+        
+        # check which turn to move, and perform the move of the agent
+        if self.board.turn == chess.WHITE:
+            next_move = self.white_agent.move(self.board)
+        elif self.board.turn == chess.BLACK:
+            next_move = self.black_agent.move(self.board)
+
+        # push the move to the board
+        self.board.push(next_move)
         target.object = self.board
 
     def show(self):
 
         board_pane = pn.panel(self.board)
-        random_move_button = pn.widgets.Button(name = "random move")
-        random_move_button.link(board_pane,
-                        callbacks = {'value': self._random_move})
+        next_move_button = pn.widgets.Button(name = "Next move")
+        next_move_button.link(board_pane,
+                        callbacks = {'value': self._move})
 
-        panel = pn.Column(board_pane, random_move_button)
+        panel = pn.Column(board_pane, next_move_button)
         panel.show()
